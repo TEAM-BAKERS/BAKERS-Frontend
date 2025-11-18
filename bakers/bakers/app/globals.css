@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 100 900; /* 100부터 900까지 모든 굵기 지원 */
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "Pretendard", sans-serif;
+}
