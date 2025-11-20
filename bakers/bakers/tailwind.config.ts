@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["Pretendard", "sans-serif"],
+        bagel: ["var(--font-bagel)"],
       },
       colors: {
         "brand-blue": "#005EEB", // Run 색상
