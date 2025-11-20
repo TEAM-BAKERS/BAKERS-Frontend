@@ -1,7 +1,11 @@
-export default function Home() {
+import { redirect } from "next/navigation";
+
+export default async function HomePage() {
+  redirect(`/login`);
+
   return (
-    <>
-      <p>시작 페이지</p>
-    </>
+    <div>
+      <p>이동 중...</p>
+    </div>
   );
 }

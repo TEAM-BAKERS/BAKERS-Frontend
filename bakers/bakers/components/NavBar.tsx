@@ -6,6 +6,10 @@ import { usePathname } from "next/navigation";
 export default function NavBar() {
   const pathname = usePathname();
 
+  if (pathname === "/home/upload") {
+    return null;
+  }
+
   const navLinks = [
     {
       label: "홈",
