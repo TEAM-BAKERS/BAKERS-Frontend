@@ -10,7 +10,7 @@ export default function Challenge() {
                     <p style={{ fontSize: '16px', fontWeight:'500',color:'#fff', marginTop:'4px', marginBottom:'40px' }}>목표를 향해 함께 달려요</p>
                 </div>
                 <div className={styles.infoContainer}>
-                    <p style={{ fontSize: '16px', fontWeight:'600',color:'#171719', marginTop:'32px'}}>진행 중인 그룹 챌린지</p>
+                    <p style={{ fontSize: '16px', fontWeight:'600',color:'#171719', marginTop:'32px'}}>진행 중인 크루 챌린지</p>
                     <div className={styles.infoDetail}>
                         <div className={styles.upInfo}>
                             <div className={styles.imgWrap}>

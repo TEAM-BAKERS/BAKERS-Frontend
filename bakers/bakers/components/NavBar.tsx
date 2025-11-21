@@ -24,7 +24,7 @@ export default function NavBar() {
       activeIcon: "/NavIcons/running-blue.svg",
     },
     {
-      label: "그룹",
+      label: "크루",
       href: "/group",
       icon: "/NavIcons/group.svg",
       activeIcon: "/NavIcons/group-blue.svg",
