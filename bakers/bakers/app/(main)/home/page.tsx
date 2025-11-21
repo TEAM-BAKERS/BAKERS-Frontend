@@ -62,7 +62,7 @@ export default function HomePage() {
           {/* 4. 이번 주 챌린지 (Challenge) */}
           <section>
             <h2 className="text-base font-semibold leading-normal tracking-[0.091px] mb-3 pl-1">
-              이번 주 챌린지 <span className="text-lg">🔥</span>
+              이번 주 배틀리그 <span className="text-lg">🔥</span>
             </h2>
             <div className="bg-bg-gray rounded-[12px] p-7 shadow-sm">
               {/* Run vs Duel 텍스트 */}
@@ -105,7 +105,7 @@ export default function HomePage() {
           <section>
             <div className="flex justify-between items-center mb-3 pl-1 pr-1">
               <h2 className="text-base font-semibold leading-normal tracking-[0.091px] mb-3 pl-1">
-                그룹 활동
+                크루 활동
               </h2>
               <button className="text-sm font-medium text-primary-blue text-center leading-[142.9%] tracking-[0.203px] [font-feature-settings: 'ss10']">
                 전체보기

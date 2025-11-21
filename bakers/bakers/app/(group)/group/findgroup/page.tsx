@@ -65,7 +65,7 @@ const DUMMY_GROUPS: GroupData[] = [
 ];
 
 // ----------------------------------------------------
-// 3. 재사용 가능한 그룹 카드 컴포넌트 정의
+// 3. 재사용 가능한 크루 카드 컴포넌트 정의
 // ----------------------------------------------------
 function GroupCard({ group, onApplyClick }: { group: GroupData, onApplyClick: (groupName: string) => void }) {
     
@@ -81,7 +81,7 @@ function GroupCard({ group, onApplyClick }: { group: GroupData, onApplyClick: (g
             <div className={styles.upInfo}>
                 <Image
                     src={group.groupImage}
-                    alt={`${group.name} 그룹 이미지`}
+                    alt={`${group.name} 크루 이미지`}
                     width={64} 
                     height={64}
                     className={styles.groupImage} 
@@ -131,7 +131,7 @@ function GroupCard({ group, onApplyClick }: { group: GroupData, onApplyClick: (g
                 {/* 💡 버튼 클릭 시 onApplyClick 함수 실행 */}
                 <button 
                     className={styles.applyBtn}
-                    onClick={() => onApplyClick(group.name)} // 그룹 이름을 상위 컴포넌트로 전달
+                    onClick={() => onApplyClick(group.name)} // 크루 이름을 상위 컴포넌트로 전달
                 >
                     가입 신청
                 </button>
@@ -171,9 +171,9 @@ function ApplyModal({ groupName, onClose }: ApplyModalProps) {
 
                 {/* 안내 문구 */}
                 <p className={styles.modalBodyText}>
-                    이 그룹에 가입 신청하시겠어요?
+                    이 크루에 가입 신청하시겠어요?
                     <br/>
-                    그룹장 승인 후 가입이 완료됩니다
+                    크루장 승인 후 가입이 완료됩니다
                 </p>
 
                 {/* 버튼 영역 */}
@@ -227,12 +227,12 @@ export default function Findgroup() {
         <div className={styles.outerContainer}>
             <div className={styles.container}>
                 <div className={styles.upperContainer}>
-                    <p style={{fontSize:'20px', fontWeight:'600', marginTop:'16px'}}>그룹 찾기</p>
+                    <p style={{fontSize:'20px', fontWeight:'600', marginTop:'16px'}}>크루 찾기</p>
                     <div className={styles.searchBox}>
                         <input
                             type="text"
                             className={styles.searchInput}
-                            placeholder="그룹명 또는 태그를 입력해주세요"
+                            placeholder="크루명 또는 태그를 입력해주세요"
                             value={searchTerm}
                             onChange={handleSearchChange}
                         />
@@ -241,7 +241,7 @@ export default function Findgroup() {
                 <hr/>
                 <div className={styles.infoContainer}>
                     <p style={{fontSize:'16px',fontWeight:'400',color:'#171719', marginTop:'24px', marginBottom:'24px'}}>
-                        총 <span style={{color:'#06f', fontWeight:'600'}}>{filteredGroups.length}개</span>의 그룹을 찾았습니다
+                        총 <span style={{color:'#06f', fontWeight:'600'}}>{filteredGroups.length}개</span>의 크루를 찾았습니다
                     </p>
                     
                     {filteredGroups.map((group) => (
