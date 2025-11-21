@@ -94,7 +94,7 @@ export default function Challenge() {
                     <p style={{ fontSize: '16px', fontWeight:'600',color:'#171719', marginTop:'32px'}}>나의 개인 챌린지</p>
                     <div className={styles.infoDetail}>
                         <div className={styles.upInfo}>
-                            <div className={styles.imgWrap}>
+                            <div className={styles.imgWrap} style={{backgroundColor:'#632FE9'}}>
                                 <Image
                                                 src="/star.svg"
                                                 alt="달성 아이콘"
@@ -133,7 +133,7 @@ export default function Challenge() {
                     </div>
                     <div className={styles.infoDetail}>
                         <div className={styles.upInfo}>
-                            <div className={styles.imgWrap}>
+                            <div className={styles.imgWrap} style={{backgroundColor:'#632FE9'}}>
                                 <Image
                                                 src="/star.svg"
                                                 alt="달성 아이콘"
