@@ -39,12 +39,22 @@ export default function SignupPage() {
 
       {/* 입력 폼 영역 */}
       <div className="flex flex-1 flex-col gap-8">
-        {/* 아이디 */}
+        {/* 이름 */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">아이디</label>
+          <label className="text-sm font-medium">이름</label>
           <input
             type="text"
-            placeholder="아이디를 입력하세요 (4자 이상)"
+            placeholder="이름을 입력하세요"
+            className="w-full rounded-xl bg-bg-gray px-4 py-3 text-base placeholder:text-sub-gray"
+          />
+        </div>
+
+        {/* 이메일주소 */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">이메일 주소</label>
+          <input
+            type="text"
+            placeholder="이메일 주소를 입력하세요"
             className="w-full rounded-xl bg-bg-gray px-4 py-3 text-base placeholder:text-sub-gray"
           />
         </div>

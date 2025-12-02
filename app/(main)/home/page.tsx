@@ -59,16 +59,25 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* 4. 이번 주 챌린지 (Challenge) */}
+          {/* 4. 이번 달 배틀리그 */}
           <section>
-            <h2 className="text-base font-semibold leading-normal tracking-[0.091px] mb-3 pl-1">
-              이번 주 챌린지 <span className="text-lg">🔥</span>
-            </h2>
+            <div className="flex justify-between items-center mb-3 pl-1 pr-1">
+              <h2 className="text-base font-semibold leading-normal tracking-[0.091px] mb-3 pl-1">
+                이번 달 배틀 리그 <span className="text-lg">🔥</span>
+              </h2>
+              <button
+                onClick={() => router.push("/home/battle-league")}
+                className="text-sm font-medium text-primary-blue text-center leading-[142.9%] tracking-[0.203px] [font-feature-settings: 'ss10']"
+              >
+                더보기
+              </button>
+            </div>
+
             <div className="bg-bg-gray rounded-[12px] p-7 shadow-sm">
-              {/* Run vs Duel 텍스트 */}
               <div className="flex justify-between items-end mb-6 px-4">
+                {/* 우리팀 */}
                 <div className="text-center">
-                  <p className="text-[32px] font-bagel text-brand-blue">Run</p>
+                  <p className="text-[32px] font-kbl text-brand-blue">Run</p>
                   <div className="text-2xl font-bold text-gray-800">
                     24
                     <span className="text-sm font-normal ml-1">km</span>
@@ -77,8 +86,9 @@ export default function HomePage() {
                 <div className="text-[rgba(46,47,51,0.88)] font-bagel text-2xl mb-3">
                   vs
                 </div>
+                {/* 상대팀 */}
                 <div className="text-center">
-                  <p className="text-[32px] font-bagel text-brand-red">Duel</p>{" "}
+                  <p className="text-[32px] font-kbl text-brand-red">Duel</p>
                   <div className="text-2xl font-bold text-gray-800">
                     27
                     <span className="text-sm font-normal ml-1">km</span>
