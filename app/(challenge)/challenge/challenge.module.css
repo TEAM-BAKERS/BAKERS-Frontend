@@ -1,0 +1,106 @@
+/* 전체 화면 중앙 정렬 */
+.outerContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  justify-content: center;
+}
+
+/* 모바일 뷰 제한 컨테이너 (최대 430px) */
+.container {
+  width: 100%;
+  max-width: 430px; 
+  background-color: #F7F7F8;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 96px; 
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1); 
+  overflow: hidden; 
+  font-family: "Pretendard";
+}
+
+.upperSection{
+    width: 100%;
+    height: 152px;
+    background-color: #0066FF;
+    padding: 20px;
+}
+
+.infoContainer{
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    gap: 16px;
+}
+
+.infoDetail{
+    background-color: #fff;
+    border-radius: 13px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+}
+
+.upInfo{
+    display: flex;
+    justify-content: space-between;
+}
+
+.imgWrap{
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    background-color: #0066FF;
+    margin-right: 16px;
+}
+
+.ddaywrap{
+    width: 71px;
+    height: 32px;
+    background-color: #FFDFCC;
+    border: 1px solid #E86014;
+    border-radius: 10px;
+    color: #8F3400;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.midInfo{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* 📌 프로그레스 바 전체 컨테이너 스타일 */
+.progressBarContainer {
+    width: 100%;
+    background-color: #e0e0e0; /* 연한 회색 배경 */
+    border-radius: 8px;
+    overflow: hidden; 
+    /* 높이는 React에서 인라인 스타일로 설정 예정 */
+}
+
+/* 📌 진행률을 나타내는 내부 막대 스타일 */
+.progressBarFill {
+    height: 100%; /* 부모(Container)의 높이를 꽉 채움 */
+    border-radius: 8px;
+    transition: width 0.5s ease-out; /* 부드러운 애니메이션 효과 */
+    box-sizing: border-box;
+    /* 너비와 색상은 React에서 인라인 스타일로 설정 예정 */
+}
+
+.wrap{
+    display: flex;
+    width: 100%;
+}
