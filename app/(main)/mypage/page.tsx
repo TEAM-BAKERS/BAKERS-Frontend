@@ -15,7 +15,7 @@ export default function MyPage() {
         </div>
 
         {/* 프로필 카드 */}
-        <div className="w-full rounded-3xl bg-white/20 p-6 text-white backdrop-blur-sm">
+        <div className="w-full rounded-2xl bg-white/20 p-6 text-white backdrop-blur-sm">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/30">
