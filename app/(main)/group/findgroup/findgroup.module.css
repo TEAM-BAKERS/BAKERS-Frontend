@@ -273,3 +273,8 @@
     background-color: #f0f0f5; /* 마우스 오버 시 색상 변경 */
     font-weight: 500;
 }
+
+.statIcon{
+  width: 18px;
+  height: 18px;
+}
