@@ -4,8 +4,90 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import TeamBattle from "@/components/Teambattle";
 
+interface BattleLeague {
+  myCrewName: string;
+  opponentCrewName: string;
+  myCrewDistance: number;
+  opponentCrewDistance: number;
+}
+
+interface TodayRunning {
+  distance: number;
+  duration: number; // 초 단위
+  pace: number; // 초/km
+}
+
+interface RecentActivity {
+  nickname: string;
+  distance: number;
+  duration: number;
+  pace: number;
+  profileImage?: string; // API에 없다면 기본 이미지 사용
+}
+
+interface HomeData {
+  battleLeague: BattleLeague | null;
+  todayRunning: TodayRunning | null;
+  recentActivities: RecentActivity[];
+}
+
 export default function HomePage() {
   const router = useRouter();
+  const [homeData, setHomeData] = useState<HomeData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        // 토큰이 필요한 경우 헤더에 추가
+        const token = localStorage.getItem("accessToken");
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/home`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setHomeData(data);
+        } else {
+          console.error("홈 데이터 불러오기 실패");
+        }
+      } catch (error) {
+        console.error("에러 발생:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
+
+  // 3. 헬퍼 함수: 시간 포맷팅 (초 -> mm:ss)
+  const formatTime = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  // 헬퍼 함수: 페이스 포맷팅 (초 -> m'ss")
+  const formatPace = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min}'${sec.toString().padStart(2, "0")}"`;
+  };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        로딩 중...
+      </div>
+    );
 
   // 렌더링
   return (
@@ -36,30 +118,39 @@ export default function HomePage() {
               오늘의 러닝
             </h2>
             <div className="bg-white rounded-[12px] px-1 py-6 flex justify-between items-center w-full">
-              <div className="flex-1 flex flex-col items-center gap-2">
-                <span className="text-2xl font-bold text-black text-center tracking-[-0.552px] [font-feature-settings: 'ss10']">
-                  5.24
-                </span>
-                <span className="text-sm text-sub-gray mt-1 font-medium">
-                  거리
-                </span>
-              </div>
-              <div className="flex-1 flex flex-col items-center gap-2">
-                <span className="text-2xl font-bold text-black text-center tracking-[-0.552px] [font-feature-settings: 'ss10']">
-                  39:12
-                </span>
-                <span className="text-sm text-sub-gray mt-1 font-medium">
-                  시간
-                </span>
-              </div>
-              <div className="flex-1 flex flex-col items-center gap-2">
-                <span className="text-2xl font-bold text-black text-center tracking-[-0.552px] [font-feature-settings: 'ss10']">
-                  7&rsquo;30&rdquo;
-                </span>
-                <span className="text-sm text-sub-gray mt-1 font-medium">
-                  페이스
-                </span>
-              </div>
+              {homeData?.todayRunning ? (
+                <>
+                  <div className="flex-1 flex flex-col items-center gap-2">
+                    <span className="text-2xl font-bold text-black text-center tracking-[-0.552px] [font-feature-settings: 'ss10']">
+                      {(homeData.todayRunning.distance / 1000).toFixed(2)}{" "}
+                      {/* m -> km */}
+                    </span>
+                    <span className="text-sm text-sub-gray mt-1 font-medium">
+                      거리 (km)
+                    </span>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center gap-2">
+                    <span className="text-2xl font-bold text-black text-center tracking-[-0.552px] [font-feature-settings: 'ss10']">
+                      {formatTime(homeData.todayRunning.duration)}
+                    </span>
+                    <span className="text-sm text-sub-gray mt-1 font-medium">
+                      시간
+                    </span>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center gap-2">
+                    <span className="text-2xl font-bold text-black text-center tracking-[-0.552px] [font-feature-settings: 'ss10']">
+                      {formatPace(homeData.todayRunning.pace)}
+                    </span>
+                    <span className="text-sm text-sub-gray mt-1 font-medium">
+                      페이스
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full text-center py-4 text-gray-400">
+                  오늘의 러닝 기록이 없습니다.
+                </div>
+              )}
             </div>
           </section>
 
@@ -76,7 +167,18 @@ export default function HomePage() {
                 더보기
               </button>
             </div>
-            <TeamBattle />
+            {homeData?.battleLeague ? (
+              <TeamBattle
+                myTeamName={homeData.battleLeague.myCrewName}
+                opponentTeamName={homeData.battleLeague.opponentCrewName}
+                myTeamDistance={homeData.battleLeague.myCrewDistance}
+                opponentTeamDistance={
+                  homeData.battleLeague.opponentCrewDistance
+                }
+              />
+            ) : (
+              <p>진행 중인 배틀이 없습니다</p>
+            )}
           </section>
 
           {/* 5. 그룹 활동 (Group Activity) */}
@@ -90,68 +192,53 @@ export default function HomePage() {
               </button>
             </div>
 
-            {/* 리스트 아이템 1 */}
-            <div className="bg-white rounded-xl p-5 flex gap-4 mb-3">
-              <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
-                {/* 프로필 이미지 자리 */}
-                {/* <Image src="..." /> */}
-                <Image
-                  src="/profile.png"
-                  alt="profile image"
-                  height={56}
-                  width={56}
-                />
-                <div className="w-full h-full bg-gray-300" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-[15px]">이세빈</h3>
-                    <p className="text-sub-gray text-xs mt-0.5">
-                      새로운 기록을 공유했어요
-                    </p>
+            {/* 활동 리스트 (API 데이터 매핑) */}
+            <div className="flex flex-col gap-3">
+              {homeData?.recentActivities &&
+              homeData.recentActivities.length > 0 ? (
+                homeData.recentActivities.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl p-5 flex gap-4"
+                  >
+                    <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                      <Image
+                        src={activity.profileImage || "/profile.png"} // 없으면 기본 이미지
+                        alt="profile image"
+                        height={56}
+                        width={56}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-[15px]">
+                            {activity.nickname}
+                          </h3>
+                          <p className="text-sub-gray text-xs mt-0.5">
+                            새로운 기록을 공유했어요
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 mt-3 text-xs text-sub-gray font-medium">
+                        <span className="flex items-center gap-1">
+                          📍 {(activity.distance / 1000).toFixed(2)}km
+                        </span>
+                        <span className="flex items-center gap-1">
+                          ⏱️ {formatTime(activity.duration)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          ⚡ {formatPace(activity.pace)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  최근 활동이 없습니다.
                 </div>
-                <div className="flex items-center gap-3 mt-3 text-xs text-sub-gray font-medium">
-                  <span className="flex items-center gap-1">📍 5.2km</span>
-                  <span className="flex items-center gap-1">⏱️ 39분</span>
-                  <span className="flex items-center gap-1">
-                    ⚡ 7&rsquo;30&rdquo;
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* 리스트 아이템 2 (잘린 모습 표현을 위해 추가) */}
-            <div className="bg-white rounded-xl p-5 flex gap-4 mb-3">
-              <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
-                {/* 프로필 이미지 자리 */}
-                {/* <Image src="..." /> */}
-                <Image
-                  src="/profile.png"
-                  alt="profile image"
-                  height={56}
-                  width={56}
-                />
-                <div className="w-full h-full bg-gray-300" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-[15px]">이세빈</h3>
-                    <p className="text-sub-gray text-xs mt-0.5">
-                      새로운 기록을 공유했어요
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 mt-3 text-xs text-sub-gray font-medium">
-                  <span className="flex items-center gap-1">📍 5.2km</span>
-                  <span className="flex items-center gap-1">⏱️ 39분</span>
-                  <span className="flex items-center gap-1">
-                    ⚡ 7&rsquo;30&rdquo;
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
           </section>
         </main>

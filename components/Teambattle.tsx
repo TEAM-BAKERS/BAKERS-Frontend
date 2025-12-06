@@ -1,14 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 
-// 더미 데이터 (나중에 API로 교체)
-const DUMMY_BATTLE_DATA = {
-  myTeam: { name: "Run", distance: 52 },
-  enemyTeam: { name: "Duel", distance: 29 },
-  dDay: 20,
-};
+interface TeamBattleProps {
+  myTeamName: string;
+  opponentTeamName: string;
+  myTeamDistance: number; // 미터(m) 단위로 받음
+  opponentTeamDistance: number; // 미터(m) 단위로 받음
+}
 
-export default function TeamBattle() {
+export default function TeamBattle({
+  myTeamName,
+  opponentTeamName,
+  myTeamDistance,
+  opponentTeamDistance,
+}: TeamBattleProps) {
   // 날짜 계산 - 디데이
   const [leagueInfo, setLeagueInfo] = useState({
     month: 0,
@@ -36,12 +41,15 @@ export default function TeamBattle() {
   }, []);
 
   // 퍼센트 계산 로직
-  const totalDistance =
-    DUMMY_BATTLE_DATA.myTeam.distance + DUMMY_BATTLE_DATA.enemyTeam.distance;
-  const myTeamPercent = Math.round(
-    (DUMMY_BATTLE_DATA.myTeam.distance / totalDistance) * 100
-  );
-  const enemyTeamPercent = 100 - myTeamPercent;
+  const totalDistance = myTeamDistance + opponentTeamDistance;
+
+  // 0으로 나누기 방지 (초기 상태일 때 NaN 방지)
+  const myTeamPercent =
+    totalDistance === 0
+      ? 50
+      : Math.round((myTeamDistance / totalDistance) * 100);
+
+  const opponentTeamPercent = 100 - myTeamPercent;
 
   return (
     <>
@@ -51,10 +59,10 @@ export default function TeamBattle() {
         <div className="flex justify-between items-end mb-6 px-2">
           <div className="text-center">
             <div className="text-[32px] font-kbl text-brand-blue">
-              {DUMMY_BATTLE_DATA.myTeam.name}
+              {myTeamName}
             </div>
             <div className="text-2xl font-bold text-gray-800">
-              {DUMMY_BATTLE_DATA.myTeam.distance}
+              {Math.round(myTeamDistance / 1000)}
               <span className="text-sm font-normal ml-1">km</span>
             </div>
           </div>
@@ -63,10 +71,10 @@ export default function TeamBattle() {
           </div>
           <div className="text-center">
             <div className="text-[32px] font-kbl text-brand-red">
-              {DUMMY_BATTLE_DATA.enemyTeam.name}
+              {opponentTeamName}
             </div>
             <div className="text-2xl font-bold text-gray-800">
-              {DUMMY_BATTLE_DATA.enemyTeam.distance}
+              {Math.round(opponentTeamDistance / 1000)}
               <span className="text-sm font-normal ml-1">km</span>
             </div>
           </div>
@@ -80,7 +88,7 @@ export default function TeamBattle() {
           ></div>
           <div
             className="h-full bg-brand-red"
-            style={{ width: `${enemyTeamPercent}%` }}
+            style={{ width: `${opponentTeamPercent}%` }}
           ></div>
         </div>
 
@@ -94,7 +102,7 @@ export default function TeamBattle() {
               {leagueInfo.dDay === 0 ? "D-Day" : `D-${leagueInfo.dDay}`}
             </span>
           </div>
-          <span>{enemyTeamPercent}%</span>
+          <span>{opponentTeamPercent}%</span>
         </div>
       </section>
     </>
