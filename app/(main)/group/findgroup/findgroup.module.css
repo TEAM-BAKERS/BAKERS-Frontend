@@ -206,3 +206,70 @@
     cursor: pointer;
     font-weight: 600;
 }
+
+/* 검색창과 자동완성 목록을 감싸는 Wrapper */
+.searchAutocompleteWrapper {
+    width: 100%;
+    /* upperContainer가 중앙 정렬이므로, 이 wrapper는 컨테이너의 너비에 맞게 설정 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* input과 list를 중앙 정렬 */
+    position: relative; /* 자동완성 목록을 띄우기 위함 */
+}
+
+/* 검색창 div (기존 searchBox와 동일 역할) */
+.searchBox {
+    z-index: 10; /* input이 목록 위에 오도록 */
+}
+
+/* 검색 input */
+.searchInput{
+    /* ... 기존 스타일 유지 ... */
+    border-radius: 12px;
+    width: 334px;
+    height: 48px;
+    padding: 12px;
+    background-color: rgba(112, 115, 124, 0.08);
+    color: #111;
+}
+.searchInput:focus{
+    outline: 2px solid #0066FF; /* 포커스 시 강조 */
+}
+
+/* 자동완성 목록 스타일 */
+.autocompleteList {
+    position: absolute; /* 검색창 바로 아래에 띄우기 */
+    top: 100%; /* 검색창 아래에 배치 */
+    width: 334px; /* 검색창과 너비 맞추기 */
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0; /* 검색창과의 간격 */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 5; /* 목록이 다른 콘텐츠 위에 오도록 */
+    max-height: 200px;
+    overflow-y: auto;
+    left: 50%;
+    transform: translateX(-50%); /* 중앙 정렬 */
+}
+
+/* 자동완성 개별 항목 스타일 */
+.autocompleteItem {
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 400;
+    color: #171719;
+    text-align: left;
+}
+
+.autocompleteItem:last-child {
+    border-bottom: none;
+}
+
+.autocompleteItem:hover {
+    background-color: #f0f0f5; /* 마우스 오버 시 색상 변경 */
+    font-weight: 500;
+}

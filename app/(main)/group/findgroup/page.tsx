@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Image from 'next/image';
 import styles from "./findgroup.module.css"; // CSS Module 임포트
 
@@ -16,6 +16,12 @@ interface GroupData {
     memberLimit: number;
     totalDistance: number;
     groupImage: string;
+}
+
+// 💡 자동완성 결과 타입 (API 응답 기반)
+interface AutoCompleteResult {
+    id: number;
+    name: string;
 }
 
 // ----------------------------------------------------
@@ -64,8 +70,23 @@ const DUMMY_GROUPS: GroupData[] = [
     }
 ];
 
+// 💡 API 명세 응답 구조를 모방한 더미 자동완성 데이터
+const DUMMY_AUTOCOMPLETE: AutoCompleteResult[] = [
+    // API 응답 예시와 비슷한 데이터 추가
+    { id: 1, name: "한강 러닝 크루" },
+    { id: 5, name: "한강에서" },
+    { id: 6, name: "한강" },
+    { id: 7, name: "을지로런 크루" },
+    { id: 8, name: "탄천 슬로우 러닝" },
+    { id: 9, name: "스피드 챌린저스" },
+    { id: 10, name: "러닝" },
+    { id: 11, name: "크루" },
+    { id: 12, name: "챌린저스" },
+];
+
 // ----------------------------------------------------
-// 3. 재사용 가능한 크루 카드 컴포넌트 정의
+// 3. 재사용 가능한 크루 카드 컴포넌트 정의 (GroupCard)
+// (변경 없음)
 // ----------------------------------------------------
 function GroupCard({ group, onApplyClick }: { group: GroupData, onApplyClick: (groupName: string) => void }) {
     
@@ -140,9 +161,9 @@ function GroupCard({ group, onApplyClick }: { group: GroupData, onApplyClick: (g
     );
 }
 
-
 // ----------------------------------------------------
-// 5. 가입 신청 모달 컴포넌트
+// 5. 가입 신청 모달 컴포넌트 (ApplyModal)
+// (변경 없음)
 // ----------------------------------------------------
 interface ApplyModalProps {
     groupName: string;
@@ -198,20 +219,78 @@ function ApplyModal({ groupName, onClose }: ApplyModalProps) {
 }
 
 // ----------------------------------------------------
-// 4. 메인 페이지 컴포넌트 (모달 상태 관리)
+// 6. 자동완성 항목 컴포넌트 (AutoCompleteItem)
+// ----------------------------------------------------
+interface AutoCompleteItemProps {
+    result: AutoCompleteResult;
+    onClick: (name: string) => void;
+}
+
+function AutoCompleteItem({ result, onClick }: AutoCompleteItemProps) {
+    return (
+        <li 
+            className={styles.autocompleteItem} 
+            onClick={() => onClick(result.name)}
+        >
+            {result.name}
+        </li>
+    );
+}
+
+
+// ----------------------------------------------------
+// 4. 메인 페이지 컴포넌트 (모달 및 자동완성 상태 관리)
 // ----------------------------------------------------
 export default function Findgroup() {
     
-    const filteredGroups = DUMMY_GROUPS;
-
+    // 💡 자동완성 결과 상태 추가
+    const [autocompleteResults, setAutocompleteResults] = useState<AutoCompleteResult[]>([]);
+    
     const [searchTerm, setSearchTerm] = useState('');
     
     // 💡 모달 상태 관리: null이면 닫혀있음, 문자열이면 열려있음 (선택된 그룹 이름)
     const [modalGroup, setModalGroup] = useState<string | null>(null); 
 
+    // 💡 API 호출 시뮬레이션 함수 (키워드가 입력될 때마다 호출될 로직)
+    const fetchAutocomplete = (keyword: string) => {
+        // 실제 API 호출 (GET /api/crew/search/keyword?keyword=...) 대신 더미 데이터 사용
+        // 실제 코드에서는 fetch('/api/crew/search/keyword?keyword=' + keyword, { headers: { Authorization: '...' }}) 사용
+
+        if (!keyword.trim()) {
+            setAutocompleteResults([]);
+            return;
+        }
+
+        // 키워드로 시작하는 크루명 반환 로직 모방
+        const filtered = DUMMY_AUTOCOMPLETE
+            .filter(item => 
+                item.name.toLowerCase().startsWith(keyword.toLowerCase())
+            )
+            // 최대 5개까지만 표시
+            .slice(0, 5); 
+            
+        setAutocompleteResults(filtered);
+    }
+    
+    // 💡 검색어 변경 핸들러
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
+        const newSearchTerm = event.target.value;
+        setSearchTerm(newSearchTerm);
+
+        // 검색어가 변경될 때마다 자동완성 함수 호출
+        fetchAutocomplete(newSearchTerm);
     };
+
+    // 💡 자동완성 항목 클릭 핸들러
+    const handleAutocompleteClick = (name: string) => {
+        // 선택된 이름으로 검색창의 내용을 업데이트
+        setSearchTerm(name); 
+        // 자동완성 목록 닫기
+        setAutocompleteResults([]); 
+        // 💡 선택된 크루명으로 바로 검색을 수행하는 로직을 여기에 추가할 수 있습니다.
+        // 예: fetchFilteredGroups(name);
+    }
+
 
     // 💡 모달 열기 핸들러
     const handleOpenModal = (groupName: string) => {
@@ -223,22 +302,44 @@ export default function Findgroup() {
         setModalGroup(null);
     };
 
+    // 현재는 DUMMY_GROUPS 전체를 표시하지만, 실제로는 searchTerm에 따라 필터링/API 호출 필요
+    const filteredGroups = DUMMY_GROUPS;
+
     return(
         <div className={styles.outerContainer}>
             <div className={styles.container}>
                 <div className={styles.upperContainer}>
                     <p style={{fontSize:'20px', fontWeight:'600', marginTop:'16px'}}>크루 찾기</p>
-                    <div className={styles.searchBox}>
-                        <input
-                            type="text"
-                            className={styles.searchInput}
-                            placeholder="크루명 또는 태그를 입력해주세요"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
+                    
+                    {/* 💡 검색창과 자동완성 목록을 감싸는 div 추가 */}
+                    <div className={styles.searchAutocompleteWrapper}>
+                        <div className={styles.searchBox}>
+                            <input
+                                type="text"
+                                className={styles.searchInput}
+                                placeholder="크루명 또는 태그를 입력해주세요"
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+
+                        {/* 💡 자동완성 결과 목록 조건부 렌더링 */}
+                        {autocompleteResults.length > 0 && (
+                            <ul className={styles.autocompleteList}>
+                                {autocompleteResults.map((result) => (
+                                    <AutoCompleteItem 
+                                        key={result.id} 
+                                        result={result} 
+                                        onClick={handleAutocompleteClick}
+                                    />
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 </div>
-                <hr/>
+                
+                <hr style={{ width: '100%', border: '1px solid #e5e7eb' }}/>
+
                 <div className={styles.infoContainer}>
                     <p style={{fontSize:'16px',fontWeight:'400',color:'#171719', marginTop:'24px', marginBottom:'24px'}}>
                         총 <span style={{color:'#06f', fontWeight:'600'}}>{filteredGroups.length}개</span>의 크루를 찾았습니다
@@ -251,7 +352,6 @@ export default function Findgroup() {
                             onApplyClick={handleOpenModal} // 모달 열기 함수 전달
                         />
                     ))}
-
                 </div>
             </div>
             
