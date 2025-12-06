@@ -14,50 +14,38 @@ const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
 // =================================================================
-// 2. 🍪 쿠키 유틸리티 함수
-//    (Client Component에서만 작동)
+// 2. 💾 LocalStorage 유틸리티 함수
+//    (Client Component에서만 작동)
 // =================================================================
 
 /**
- * 쿠키에 값을 설정합니다.
+ * LocalStorage에 값을 설정합니다.
  */
-function setCookie(name: string, value: string, days: number = 7): void {
-  if (typeof document === 'undefined') return;
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
+function setLocalStorageItem(key: string, value: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(key, value);
   }
-  // SameSite=Lax 설정으로 보안 및 호환성 확보
-  document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax";
 }
 
 /**
- * 쿠키에서 값을 가져옵니다.
+ * LocalStorage에서 값을 가져옵니다.
  */
-function getCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
+function getLocalStorageItem(key: string): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(key);
 }
 
 /**
- * 쿠키를 삭제합니다.
+ * LocalStorage에서 키와 값을 제거합니다.
  */
-function eraseCookie(name: string): void {
-  if (typeof document === 'undefined') return;
-  document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+function removeLocalStorageItem(key: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(key);
+  }
 }
 
 // =================================================================
-// 3. 🔑 API 호출 함수
+// 3. 🔑 API 호출 함수 (이전 코드와 동일)
 // =================================================================
 
 // 타입 정의
@@ -115,8 +103,9 @@ export default function AuthTestPage() {
   const [nickname, setNickname] = useState('건우');
   const [message, setMessage] = useState('');
   
-  // 상태 변화 시 쿠키를 직접 읽어와 표시 (렌더링 시마다 최신 상태 반영)
-  const currentAccessToken = getCookie(ACCESS_TOKEN_KEY);
+  // 상태 변화 시 LocalStorage를 직접 읽어와 표시 (렌더링 시마다 최신 상태 반영)
+  // 쿠키 대신 getLocalStorageItem 사용
+  const currentAccessToken = getLocalStorageItem(ACCESS_TOKEN_KEY);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -127,11 +116,14 @@ export default function AuthTestPage() {
         // --- 로그인 로직 ---
         const result = await signin({ email, password });
         
-        // 액세스 토큰과 리프레시 토큰을 쿠키에 저장
-        setCookie(ACCESS_TOKEN_KEY, result.accessToken, 7); // 7일 유효
-        setCookie(REFRESH_TOKEN_KEY, result.refreshToken, 30); // 30일 유효
+        // 액세스 토큰과 리프레시 토큰을 LocalStorage에 저장
+        setLocalStorageItem(ACCESS_TOKEN_KEY, result.accessToken); 
+        setLocalStorageItem(REFRESH_TOKEN_KEY, result.refreshToken); 
         
-        setMessage(`✅ 로그인 성공! 토큰 저장 완료. 환영합니다!`);
+        // 토큰이 저장되었으므로 컴포넌트 강제 재렌더링
+        // (getLocalStorageItem 호출로 상태 반영됨)
+        
+        setMessage(`✅ 로그인 성공! LocalStorage에 토큰 저장 완료. 환영합니다!`);
 
       } else {
         // --- 회원가입 로직 ---
@@ -149,20 +141,23 @@ export default function AuthTestPage() {
   };
 
   const handleLogout = () => {
-    eraseCookie(ACCESS_TOKEN_KEY);
-    eraseCookie(REFRESH_TOKEN_KEY);
-    setMessage('로그아웃 되었습니다. 쿠키 삭제 완료.');
-    // 화면에 반영되도록 강제 업데이트는 필요 없지만, message 업데이트로 충분
+    // LocalStorage에서 토큰 삭제
+    removeLocalStorageItem(ACCESS_TOKEN_KEY);
+    removeLocalStorageItem(REFRESH_TOKEN_KEY);
+    setMessage('로그아웃 되었습니다. LocalStorage 토큰 삭제 완료.');
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-      <h2>{isLoginMode ? '🔑 로그인 테스트' : '📝 회원가입 테스트'}</h2>
+    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', fontFamily: 'Arial, sans-serif' }}>
+      <h2>{isLoginMode ? '🔑 로그인 테스트 (LocalStorage)' : '📝 회원가입 테스트 (LocalStorage)'}</h2>
       <p style={{ fontWeight: 'bold', color: currentAccessToken ? 'green' : 'red' }}>
         현재 로그인 상태: **{currentAccessToken ? '로그인됨 (토큰 있음)' : '로그아웃됨 (토큰 없음)'}**
+        <span style={{ fontSize: '12px', color: '#666', display: 'block' }}>
+            (개발자 도구 → Application → Local Storage에서 확인 가능)
+        </span>
       </p>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
         <input
           type="email"
           placeholder="이메일"

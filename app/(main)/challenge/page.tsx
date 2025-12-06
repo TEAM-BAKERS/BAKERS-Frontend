@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from "./challenge.module.css"; // CSS 모듈 파일 경로
+import { useRouter } from 'next/navigation'; // next/navigation을 사용합니다.
 
 // =================================================================
 // 0. 필수 상수 및 환경 변수
@@ -12,36 +13,53 @@ import styles from "./challenge.module.css"; // CSS 모듈 파일 경로
 // .env.local 파일에 정의된 NEXT_PUBLIC_API_URL을 사용합니다.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// 쿠키에 저장할 토큰 키 상수
+// 로컬 스토리지에 저장할 토큰 키 상수
 const ACCESS_TOKEN_KEY = 'accessToken';
+const REFRESH_TOKEN_KEY = 'refreshToken'; // 리프레시 토큰 키 추가 (향후 사용 대비)
+
 // API 응답 타입 정의 (protectedFetch의 반환 타입)
 type ApiResponse<T> = T; 
 
 // =================================================================
-// 1. 🍪 쿠키 유틸리티 함수 (getCookie)
+// 1. 💾 LocalStorage 유틸리티 함수
 // =================================================================
 /**
- * 쿠키에서 값을 가져옵니다. (Client Component 전용)
- * @param name 쿠키 이름
+ * LocalStorage에서 값을 가져옵니다. (Client Component 전용)
+ * @param key LocalStorage 키
  */
-function getCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
+function getLocalStorageItem(key: string): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(key);
 }
+
+/**
+ * LocalStorage에 값을 저장합니다. (Client Component 전용)
+ * @param key LocalStorage 키
+ * @param value 저장할 값
+ */
+function setLocalStorageItem(key: string, value: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(key, value);
+  }
+}
+
+/**
+ * LocalStorage에서 키와 값을 제거합니다. (로그아웃 처리 시 사용)
+ * @param key LocalStorage 키
+ */
+function removeLocalStorageItem(key: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(key);
+  }
+}
+
 
 // =================================================================
 // 2. 🔑 보호된 API 요청 함수 (protectedFetch)
 // =================================================================
 /**
  * 인증 토큰을 요구하는 API 요청을 처리하는 제네릭 함수.
- * 쿠키에서 accessToken을 자동으로 읽어와 Authorization 헤더에 추가합니다.
+ * LocalStorage에서 accessToken을 자동으로 읽어와 Authorization 헤더에 추가합니다.
  * @param endpoint API 엔드포인트 경로
  * @param options fetch에 전달할 추가 옵션
  */
@@ -50,12 +68,12 @@ async function protectedFetch<T>(endpoint: string, options: RequestInit = {}): P
     throw new Error("NEXT_PUBLIC_API_URL 환경 변수가 설정되지 않았습니다.");
   }
   
-  // 1. 쿠키에서 accessToken을 읽어옵니다.
-  const accessToken = getCookie(ACCESS_TOKEN_KEY); 
+  // 1. LocalStorage에서 accessToken을 읽어옵니다.
+  const accessToken = getLocalStorageItem(ACCESS_TOKEN_KEY); 
 
   if (!accessToken) {
-    // 토큰이 없으면 에러 발생 (로그인 필요)
-    throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다.');
+    // 토큰이 없으면 강제로 에러 발생 (로그인 필요)
+    throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다. (LocalStorage is empty)');
   }
 
   // 2. Authorization 헤더 설정 (Bearer 스키마 사용)
@@ -70,9 +88,15 @@ async function protectedFetch<T>(endpoint: string, options: RequestInit = {}): P
     ...options,
     headers,
   });
-
-  // 3. 응답 오류 처리
+  
+  // 3. 응답 오류 처리 (401: 권한 없음, 403: 접근 금지 등)
   if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+          // 토큰 만료 또는 권한 부족 시 강제 에러 throw
+          const authError = await response.json().catch(() => ({ message: "인증/권한 오류" }));
+          throw new Error(`인증 오류 (${response.status}): ${authError.message}. 로그인이 필요합니다.`);
+      }
+
     try {
         const errorData = await response.json();
         throw new Error(errorData.message || `API 요청 실패 (Status: ${response.status})`);
@@ -91,7 +115,7 @@ async function protectedFetch<T>(endpoint: string, options: RequestInit = {}): P
 }
 
 // =================================================================
-// 3. 챌린지 관련 타입 정의 (명세서 기반)
+// 3. 챌린지 관련 타입 정의 (이전 코드와 동일)
 // =================================================================
 
 interface CrewMember {
@@ -135,7 +159,7 @@ interface ChallengeResponse {
 type ChallengeItem = CrewChallenge | PersonalChallenge;
 
 // =================================================================
-// 4. 목(Mock) 데이터 정의 (API 호출 실패 시 사용)
+// 4. 목(Mock) 데이터 정의 (이전 코드와 동일)
 // =================================================================
 
 const MOCK_CHALLENGE_DATA: ChallengeResponse = {
@@ -196,7 +220,7 @@ const MOCK_CHALLENGE_DATA: ChallengeResponse = {
 };
 
 // =================================================================
-// 5. 데이터 포맷팅 및 챌린지 카드 컴포넌트
+// 5. 데이터 포맷팅 및 챌린지 카드 컴포넌트 (이전 코드와 동일)
 // =================================================================
 
 /**
@@ -204,12 +228,10 @@ const MOCK_CHALLENGE_DATA: ChallengeResponse = {
  */
 const formatChallengeValue = (challenge: ChallengeItem) => {
     if (challenge.type === 'DISTANCE') {
-        // type이 DISTANCE면 → goalValue/1000 + " km" 표시
         const currentKm = (challenge.currentValue / 1000).toFixed(1);
         const goalKm = challenge.goalValue / 1000;
         return `${currentKm}/${goalKm} km`;
     } else if (challenge.type === 'STREAK') {
-        // type이 STREAK면 → goalValue + " 회" 표시
         return `${challenge.currentValue}/${challenge.goalValue} 회`;
     }
     return `${challenge.currentValue}/${challenge.goalValue}`;
@@ -295,6 +317,15 @@ const ChallengeDetailCard: React.FC<{ challenge: ChallengeItem; isCrew: boolean 
 export default function Challenge() {
     const [challengeData, setChallengeData] = useState<ChallengeResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter(); // 라우터 훅 사용
+
+    const handleAuthError = () => {
+        // 토큰 제거 및 로그인 페이지로 리다이렉션
+        removeLocalStorageItem(ACCESS_TOKEN_KEY);
+        removeLocalStorageItem(REFRESH_TOKEN_KEY);
+        alert("인증 정보가 만료되었거나 유효하지 않습니다. 다시 로그인 해주세요.");
+        router.push('/login'); // 적절한 로그인 경로로 수정하세요.
+    };
 
     useEffect(() => {
         const fetchChallenges = async () => {
@@ -303,8 +334,16 @@ export default function Challenge() {
                 const data = await protectedFetch<ChallengeResponse>('/api/v1/challenges', { method: 'GET' });
                 setChallengeData(data);
             } catch (error) {
-                console.error("챌린지 API 호출 실패, 목 데이터 사용:", error);
-                // API 호출 실패 시 목 데이터로 대체
+                console.error("챌린지 API 호출 실패:", error);
+                
+                // 인증 오류 처리 (401, 403)
+                if (error instanceof Error && error.message.includes("인증 오류")) {
+                    handleAuthError();
+                    // 인증 오류 발생 시 로딩 상태를 false로 바꾸지 않고 리턴하여 화면에 에러 컴포넌트가 잠시 뜨는 것을 방지합니다.
+                    return; 
+                }
+
+                // API 호출 실패 시 (네트워크 오류, 기타 서버 오류) 목 데이터로 대체
                 setChallengeData(MOCK_CHALLENGE_DATA);
             } finally {
                 setIsLoading(false);
@@ -370,7 +409,6 @@ export default function Challenge() {
                     )}
                 </div>
             </div>
-            {/* 하단 네비게이션바 등은 기존 JSX 구조를 유지했습니다. */}
         </div>
     );
 }
