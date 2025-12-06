@@ -10,7 +10,7 @@ const bagel = Bagel_Fat_One({
 });
 
 const kblFont = localFont({
-  src: "./fonts/KBLCourt_EB.woff", // 파일 경로 (layout.tsx 기준)
+  src: "../public/fonts/KBLCourt_EB.woff", // 파일 경로 (layout.tsx 기준)
   variable: "--font-kbl", // Tailwind에서 쓸 변수 이름
   display: "swap",
 });
