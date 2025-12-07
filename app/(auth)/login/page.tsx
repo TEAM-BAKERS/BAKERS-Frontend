@@ -5,11 +5,51 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    router.push("/home");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signin`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log("로그인 성공 응답:", data);
+
+        if (data.accessToken) {
+          localStorage.setItem("accessToken", data.accessToken);
+        }
+        if (data.refreshToken) {
+          localStorage.setItem("refreshToken", data.refreshToken);
+        }
+
+        alert("로그인되었습니다!");
+        router.push("/home");
+      } else {
+        alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+      }
+    } catch (error) {
+      console.error("로그인 통신 에러:", error);
+      alert("서버와 통신 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -27,17 +67,17 @@ export default function LoginPage() {
       {/* 로그인 폼 카드 영역 */}
       <div className="w-full rounded-[16px] bg-white p-8 mb-14">
         <div className="flex flex-col gap-5">
-          {/* 아이디 입력 */}
+          {/* 이메일 입력 */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="id" className="text-sm font-medium">
+            <label htmlFor="email" className="text-sm font-medium">
               아이디
             </label>
             <input
-              id="id"
-              type="text"
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              placeholder="아이디를 입력하세요"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일을 입력하세요"
               className="w-full rounded-xl bg-bg-gray px-4 py-3 placeholder:text-sub-gray"
             />
           </div>

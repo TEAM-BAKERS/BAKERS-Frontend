@@ -11,6 +11,7 @@ const config: Config = {
       fontFamily: {
         sans: ["Pretendard", "sans-serif"],
         bagel: ["var(--font-bagel)"],
+        kbl: ["var(--font-kbl)"],
       },
       colors: {
         "brand-blue": "#005EEB", // Run 색상
