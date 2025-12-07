@@ -25,8 +25,9 @@
 .upperSection{
     width: 100%;
     /* 높이: 피그마 디자인을 위해 약 320px로 조정 */
-    height: 100%;
-    min-height: 350px; 
+    height: 50%;
+    min-height: 350px;
+    max-height: 4300px; 
     background-color: #0066FF;
     padding: 20px 20px 0; /* 하단 패딩 제거 */
     box-sizing: border-box;

@@ -208,7 +208,7 @@ function GroupCard({ group, onApplyClick }: { group: CrewData, onApplyClick: (gr
             <div className={styles.upInfo}>
                 <Image
                     // imgUrl 필드 사용
-                    src={group.imgUrl} 
+                    src={group.imgUrl || "/default-group-image.svg"}
                     alt={`${group.name} 크루 이미지`}
                     width={64} 
                     height={64}
