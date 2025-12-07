@@ -430,8 +430,9 @@
 
 .crewTop{
     display: flex;
-    justify-content: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 16px;
+    padding-left: 16px;
 }
 
 .chalwordsection{

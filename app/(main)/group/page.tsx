@@ -189,97 +189,110 @@ export default function Group() {
 
     // hasCrew: true 일 때의 상단 크루 정보 섹션
     // Crew: null이 아님을 단언(!)
-    const CrewInfoUpperSection = () => {
-        const c = crew!; 
-        return (
-            <div className={styles.upperSection}>
-                <p className={styles.titleText}>크루</p>
-                <div className={styles.crewCard}>
-                    <div className={styles.crewTop}>
-                        <Image
-                            src={c.imgUrl || "/default-group-image.svg"}
-                            alt="크루 이미지"
-                            width={48} 
-                            height={48}
-                            className={styles.crewImage}
-                        />
-                        <div className={styles.crewTextContent}>
-                            <p className={styles.crewName}>{c.name}</p> 
-                            <p className={styles.crewIntro}>{c.intro}</p>
-                        </div>
-                    </div>
-                    <div className={styles.crewStats}>
-                        <div className={styles.statItem}>
-                            <p className={styles.statValue}>{c.stats.totalDistanceKm}</p>
-                            <p className={styles.statLabel}>누적거리</p>
-                        </div>
-                        <div className={styles.statItem}>
-                            <p className={styles.statValue}>{c.stats.totalDurationHour}</p>
-                            <p className={styles.statLabel}>누적시간</p>
-                        </div>
-                        <div className={styles.statItem}>
-                            <p className={styles.statValue}>{c.stats.goalAchieveRate}%</p>
-                            <p className={styles.statLabel}>목표달성률</p>
-                        </div>
+const CrewInfoUpperSection = ({ crew }: { crew: Crew }) => {
+    // c 변수 대신 전달받은 crew 사용
+    return (
+        <div className={styles.upperSection}>
+            <p className={styles.titleText}>크루</p>
+            <div className={styles.crewCard}>
+                <div className={styles.crewTop}>
+                    <Image
+                        src={crew.imgUrl || "/solo.png"}
+                        alt="크루 이미지"
+                        width={48} 
+                        height={48}
+                        className={styles.crewImage}
+                    />
+                    <div className={styles.crewTextContent}>
+                        <p className={styles.crewName}>{crew.name}</p> 
+                        <p className={styles.crewIntro}>{crew.intro}</p>
                     </div>
                 </div>
-            </div>
-        );
-    };
-
-    // 하단 '크루 정보' 탭 내용
-    // crew 객체를 props로 명시적으로 받도록 수정
-    const CrewInfoContent = ({ crew }: { crew: Crew }) => (
-        <div className={styles.tabContent}>
-            <div className={styles.teamChallengeSection}>
-                <div className={styles.chalwordsection}>
-                    <p className={styles.sectionTitle}>팀 챌린지</p>
-                    <div className={styles.challengeRate}>{crew.teamChallenge.progressRate}%</div>
-                </div>
-                <div className={styles.chalinfosec}>
-                    <div className={styles.challengeDistance}>
-                        <p className={styles.currentDistance}>{mToKm(crew.teamChallenge.currentValue).split('.')[0]}km</p>
-                        <p className={styles.goalDistance}>목표: {mToKm(crew.teamChallenge.goalValue).split('.')[0]}km</p>
+                <div className={styles.crewStats}>
+                    {/* 🚨 수정: stats 속성에 안전하게 접근 */}
+                    <div className={styles.statItem}>
+                        <p className={styles.statValue}>{crew.stats?.totalDistanceKm ?? 0}</p>
+                        <p className={styles.statLabel}>누적거리</p>
                     </div>
-                    <div className={styles.progressBarContainer}>
-                        <div 
-                            className={styles.progressBar} 
-                            style={{ width: `${crew.teamChallenge.progressRate}%` }}
-                        />
+                    <div className={styles.statItem}>
+                        <p className={styles.statValue}>{crew.stats?.totalDurationHour ?? 0}</p>
+                        <p className={styles.statLabel}>누적시간</p>
                     </div>
-                </div>
-            </div>
-            <div className={styles.todayMembersSection}>
-                <p className={styles.sectionTitle}>오늘 달린 멤버</p>
-                <div className={styles.todayMembersList}>
-                    {/* 수정: crew.todayMembers 사용 */}
-                    {crew.todayMembers.map((member) => ( 
-                        <div key={member.userId} className={styles.memberAvatar}>
-                            <Image
-                                src={member.profileImageUrl || "/default-profile.svg"}
-                                alt={member.username || '멤버'}
-                                width={48}
-                                height={48}
-                            />
-                            <p className={styles.memberUsername}>{member.username}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className={styles.crewInfoSection}>
-                <p className={styles.sectionTitle}>크루 정보</p>
-                <div className={styles.infoRow}>
-                    <p className={styles.infoLabel}>생성일</p>
-                    <p className={styles.infoValue}>{crew.info.createdAt}</p>
-                </div>
-                <div className={styles.infoRow}>
-                    <p className={styles.infoLabel}>정원</p>
-                    <p className={styles.infoValue}>{crew.info.memberCount}/{crew.info.maxMember}명</p>
+                    <div className={styles.statItem}>
+                        <p className={styles.statValue}>{crew.stats?.goalAchieveRate ?? 0}%</p>
+                        <p className={styles.statLabel}>목표달성률</p>
+                    </div>
                 </div>
             </div>
         </div>
     );
+};
+
+const CrewInfoContent = ({ crew }: { crew: Crew }) => (
+    <div className={styles.tabContent}>
+        <div className={styles.teamChallengeSection}>
+            <div className={styles.chalwordsection}>
+                <p className={styles.sectionTitle}>팀 챌린지</p>
+                {/* 🚨 오류 발생 지점 수정: crew.teamChallenge.progressRate */}
+                <div className={styles.challengeRate}>
+                    {crew.teamChallenge?.progressRate ?? 0}% 
+                </div>
+            </div>
+            <div className={styles.chalinfosec}>
+                <div className={styles.challengeDistance}>
+                    {/* 🚨 수정: currentValue에 안전하게 접근 */}
+                    <p className={styles.currentDistance}>
+                        {mToKm(crew.teamChallenge?.currentValue ?? 0).split('.')[0]}km
+                    </p>
+                    {/* 🚨 수정: goalValue에 안전하게 접근 */}
+                    <p className={styles.goalDistance}>
+                        목표: {mToKm(crew.teamChallenge?.goalValue ?? 0).split('.')[0]}km
+                    </p>
+                </div>
+                <div className={styles.progressBarContainer}>
+                    <div 
+                        className={styles.progressBar} 
+                        // 🚨 수정: progressRate에 안전하게 접근
+                        style={{ width: `${crew.teamChallenge?.progressRate ?? 0}%` }}
+                    />
+                </div>
+            </div>
+        </div>
+        
+        {/* '오늘 달린 멤버' 섹션 수정: todayMembers가 null/undefined일 경우 빈 배열([]) 사용 */}
+        <div className={styles.todayMembersSection}>
+            <p className={styles.sectionTitle}>오늘 달린 멤버</p>
+            <div className={styles.todayMembersList}>
+                {(crew.todayMembers ?? []).map((member) => ( 
+                    <div key={member.userId} className={styles.memberAvatar}>
+                        <Image
+                            src={member.profileImageUrl || "/profile.png"}
+                            alt={member.username || '멤버'}
+                            width={48}
+                            height={48}
+                        />
+                        <p className={styles.memberUsername}>{member.username ?? "이름 없음"}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+        
+        {/* '크루 정보' 섹션 수정: info 속성에 안전하게 접근 */}
+        <div className={styles.crewInfoSection}>
+            <p className={styles.sectionTitle}>크루 정보</p>
+            <div className={styles.infoRow}>
+                <p className={styles.infoLabel}>생성일</p>
+                <p className={styles.infoValue}>{crew.info?.createdAt ?? "정보 없음"}</p>
+            </div>
+            <div className={styles.infoRow}>
+                <p className={styles.infoLabel}>정원</p>
+                <p className={styles.infoValue}>
+                    {crew.info?.memberCount ?? "?"}/{crew.info?.maxMember ?? "?"}명
+                </p>
+            </div>
+        </div>
+    </div>
+);
 
     // 하단 '멤버 목록' 탭 내용 (목업 데이터 유지)
     const MemberListContent = () => {
@@ -296,7 +309,7 @@ export default function Group() {
                 {memberList.map((member) => ( // 💡 memberList 상태 사용
                     <div key={member.userId} className={styles.memberListItem}>
                         <Image
-                            src={member.imageUrl || "/default-profile.svg"}
+                            src={member.imageUrl || "/profile.png"}
                             alt={member.nickname}
                             width={56}
                             height={56}
@@ -345,7 +358,7 @@ export default function Group() {
         <div className={styles.outerContainer}>
             <div className={styles.container}>
                 {/* 상단 크루 정보 */}
-                {hasCrew && <CrewInfoUpperSection />}
+                {hasCrew && crew && <CrewInfoUpperSection crew={crew} />}
                 
                 {/* 하단 탭 섹션 */}
                 {hasCrew && crew && ( // crew가 null이 아닐 때만 렌더링
