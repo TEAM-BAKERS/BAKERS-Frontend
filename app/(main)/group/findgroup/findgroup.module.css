@@ -152,7 +152,7 @@
 
 /* "가입 신청" 제목 */
 .modalTitle {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     color: #171719;
     margin-bottom: 20px;
@@ -277,4 +277,153 @@
 .statIcon{
   width: 18px;
   height: 18px;
+}
+
+.fabButton {
+    position: fixed;
+    bottom: 80px; /* 하단 Navigation Bar가 있다면 그 위로 위치 */
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #06f; /* 예시 색상 */
+    color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+
+/* findgroup.module.css 에 추가할 내용 */
+
+/* 2. 그룹 생성 모달 컨테이너 (GroupCreateModal) */
+.modalOverlay {
+    /* 기존 ApplyModal과 동일한 오버레이 재사용 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.createGroupModalContainer {
+    /* 첨부 이미지에 따라 높이가 높은 모달로 설정 */
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90%; /* 화면 너비에 맞춤 */
+    max-width: 450px;
+    padding: 30px 24px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 닫기 버튼은 기존 modalCloseButton 사용 */
+/* modalTitle, modalButtonArea 등 기존 스타일도 재사용 가능 */
+
+
+/* 입력 필드 제목 스타일 */
+.inputLabel {
+    font-size: 13px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+/* 일반적인 입력 스타일 (그룹 이름, 텍스트 영역) */
+.groupNameInput,
+.groupIntroTextarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    background-color: rgba(112, 115, 124, 0.08);
+    resize: none; /* textarea 크기 조절 방지 */
+}
+
+.groupNameInput:focus,
+.groupIntroTextarea:focus {
+    outline: none;
+    
+}
+
+/* findgroup.module.css 에 추가할 내용 */
+
+/* 3. 정원 입력 필드 및 버튼 스타일 */
+
+/* 정원 수치 조절 영역 전체 (레이아웃 조정) */
+.memberControl {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 입력창과 버튼 그룹 사이 간격 */
+}
+
+/* + / - 버튼을 감싸는 div (버튼 묶음) */
+.memberButtons {
+    display: flex;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 정원 표시 입력 필드 */
+.memberCountInput {
+    width: 80%; /* 너비 고정 */
+    height: 44px;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    box-sizing: border-box;
+    background-color: rgba(112, 115, 124, 0.08);
+    -moz-appearance: textfield; /* Firefox에서 숫자 입력 화살표 숨김 */
+}
+
+.memberCountInput::-webkit-outer-spin-button,
+.memberCountInput::-webkit-inner-spin-button {
+    /* Chrome, Safari에서 숫자 입력 화살표 숨김 */
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+/* + / - 개별 버튼 */
+.memberMinus,
+.memberPlus {
+    width: 44px;
+    height: 44px;
+    background-color: rgba(112, 115, 124, 0.08);
+    color: #171719;
+    font-size: 20px;
+    font-weight: 400;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.memberMinus {
+    border-right: 1px solid #e5e7eb;
+}
+
+.memberPlus:hover,
+.memberMinus:hover:not(:disabled) {
+    background-color: #e5e7eb;
+}
+
+.memberMinus:disabled {
+    color: #b0b0b0;
+    cursor: not-allowed;
 }

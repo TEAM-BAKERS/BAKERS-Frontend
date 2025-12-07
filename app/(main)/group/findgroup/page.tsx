@@ -110,6 +110,12 @@ interface SignupResponse {
     crewId: number;
     message: string;
 }
+
+interface CreateGroupResponse {
+    success: boolean;
+    crewId?: number; // 성공 시에만 존재
+    message: string;
+}
 // ----------------------------------------------------
 // 2. 목(Mock) 데이터 배열 선언 (API 응답 구조에 맞게 재구성)
 // ----------------------------------------------------
@@ -331,6 +337,202 @@ function AutoCompleteItem({ result, onClick }: AutoCompleteItemProps) {
     );
 }
 
+// =================================================================
+// 🆕 새 컴포넌트 1: 그룹 생성 플로팅 버튼 (FAB)
+// =================================================================
+interface CreateGroupFabProps {
+    onClick: () => void;
+}
+
+function CreateGroupFab({ onClick }: CreateGroupFabProps) {
+    return (
+        // FAB (Floating Action Button) 스타일을 가정하여 새로운 클래스 이름 사용
+        <button className={styles.fabButton} onClick={onClick}>
+            {/* ➕ 아이콘 (예: Plus.svg 또는 간단히 '+' 텍스트) */}
+            <span style={{ fontSize: '30px', fontWeight: '300', lineHeight: '1', color: '#fff' }}>+</span>
+        </button>
+    );
+}
+
+// =================================================================
+// 🆕 새 컴포넌트 2: 그룹 생성 모달 (API 로직 통합)
+// =================================================================
+interface CreateGroupModalProps {
+    onClose: () => void;
+    // onCreate 함수 타입 변경: API 호출을 외부에서 관리하도록 수정 (fetchCrewList를 받기 위해)
+    onCreate: (name: string, intro: string, maxMember: number) => Promise<void>; 
+}
+
+function CreateGroupModal({ onClose, onCreate }: CreateGroupModalProps) {
+    const [groupName, setGroupName] = useState('');
+    const [groupIntro, setGroupIntro] = useState('');
+    const [maxMember, setMaxMember] = useState(20); // 기본값 20
+    const [isCreating, setIsCreating] = useState(false); // 로딩 상태 추가
+
+    // 유효성 검사: 이름, 설명, 정원(최소 1명)
+    const isFormValid = groupName.trim().length > 0 && 
+                        groupIntro.trim().length > 0 && 
+                        maxMember >= 1 &&
+                        !isCreating; // 생성 중일 때는 비활성화
+
+    const handleCreate = async () => {
+        if (!isFormValid || isCreating) return;
+        
+        setIsCreating(true);
+        try {
+            await onCreate(groupName, groupIntro, maxMember);
+            onClose(); // 성공 시 모달 닫기
+        } catch (error) {
+            // onCreate 내부에서 에러 처리 및 alert이 이미 수행되므로 여기서는 무시
+            console.error("그룹 생성 중 오류 발생:", error);
+        } finally {
+            setIsCreating(false);
+        }
+    };
+    
+    // 정원 증가/감소 핸들러
+    const handleMemberChange = (delta: number) => {
+        setMaxMember(prev => Math.max(1, prev + delta)); // 최소 1명
+    }
+
+ return (
+
+        // 모달 오버레이와 컨테이너는 기존 ApplyModal의 스타일을 재사용하거나 새로 정의해야 함
+
+        <div className={styles.modalOverlay}>
+
+            <div className={styles.createGroupModalContainer}> {/* 새 스타일 클래스 */}
+
+                <button
+
+                    className={styles.modalCloseButton}
+
+                    onClick={onClose}
+
+                    style={{ position: 'absolute', top: '20px', right: '20px' }}
+
+                >
+
+                    &times;
+
+                </button>
+
+                <div className={styles.modalTitle} style={{ fontSize: '17px', fontWeight: '600', marginBottom: '40px' , textAlign:'center'}}>
+
+                    그룹 생성
+
+                </div>
+
+               
+
+                <div className={styles.inputSection}>
+
+                    <p className={styles.inputLabel}>그룹 이름</p>
+
+                    <input
+
+                        type="text"
+
+                        className={styles.groupNameInput}
+
+                        placeholder="그룹 이름을 입력하세요"
+
+                        value={groupName}
+
+                        onChange={(e) => setGroupName(e.target.value)}
+
+                    />
+
+                </div>
+
+               
+
+                <div className={styles.inputSection} style={{ marginTop: '20px' }}>
+
+                    <p className={styles.inputLabel}>그룹 설명</p>
+
+                    <textarea
+
+                        className={styles.groupIntroTextarea}
+
+                        placeholder="그룹에 대해 간단히 설명해주세요."
+
+                        rows={3}
+
+                        value={groupIntro}
+
+                        onChange={(e) => setGroupIntro(e.target.value)}
+
+                    />
+
+                </div>
+
+                <p className={styles.inputLabel}>정원</p>
+
+                <div className={styles.inputSection} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+                    <div className={styles.memberControl}>
+
+                        <input
+
+                            type="number"
+
+                            className={styles.memberCountInput}
+
+                            value={maxMember}
+
+                            readOnly // 버튼으로만 수정하도록 ReadOnly 설정
+
+                            style={{ textAlign: 'left' }}
+
+                        />
+
+                        <div className={styles.memberButtons}>
+
+                            <button className={styles.memberMinus} onClick={() => handleMemberChange(-1)} disabled={maxMember <= 1}>-</button>
+
+                            <button className={styles.memberPlus} onClick={() => handleMemberChange(1)}>+</button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+               
+
+                <div className={styles.modalButtonArea} style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '40px' }}>
+
+                    <button className={styles.modalCancelButton} onClick={onClose}>
+
+                        취소
+
+                    </button>
+
+                    <button
+
+                        className={styles.modalConfirmButton}
+
+                        onClick={handleCreate}
+
+                        disabled={!groupName || !groupIntro || maxMember < 1} // 기본 유효성 검사
+
+                    >
+
+                        생성하기
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
+
+}
+
 
 // ----------------------------------------------------
 // 4. 메인 페이지 컴포넌트 (API 로딩 및 상태 관리)
@@ -346,6 +548,7 @@ export default function Findgroup() {
     const [autocompleteResults, setAutocompleteResults] = useState<AutoCompleteResult[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [modalGroupInfo, setModalGroupInfo] = useState<CrewData | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     
     // 💡 인증 오류 처리 핸들러 (챌린지 페이지와 동일)
     const handleAuthError = useCallback(() => {
@@ -389,7 +592,7 @@ export default function Findgroup() {
         
         // 1. 모달 닫기
         setModalGroupInfo(null);
-        alert(`${modalGroupInfo.name} 크루 가입을 신청합니다...`); // UX를 위한 임시 메시지
+        console.log(`${modalGroupInfo.name} 크루 가입을 신청합니다...`); // UX를 위한 임시 메시지
 
         try {
             // POST /api/crew/signup 엔드포인트 호출
@@ -400,11 +603,11 @@ export default function Findgroup() {
             
             // 2. API 응답 처리 (성공/실패)
             if (data.success) {
-                alert(`✅ 성공: ${data.message}`); // 크루 가입 완료!
+                console.log(`✅ 성공: ${data.message}`); // 크루 가입 완료!
                 // 가입 성공 후 크루 목록을 새로고침하거나 UI를 업데이트해야 함
                 fetchCrewList(); 
             } else {
-                alert(`❌ 실패: ${data.message}`); // 이미 가입한 크루가 있는 경우
+                console.log(`❌ 실패: ${data.message}`); // 이미 가입한 크루가 있는 경우
             }
 
         } catch (error) {
@@ -413,7 +616,7 @@ export default function Findgroup() {
             if (error instanceof Error && error.message.includes("인증 오류")) {
                 handleAuthError();
             } else {
-                alert(`⛔ 오류 발생: 가입 신청에 실패했습니다.`);
+                console.log(`⛔ 오류 발생: 가입 신청에 실패했습니다.`);
             }
         }
     }, [modalGroupInfo, handleAuthError, fetchCrewList]);
@@ -468,7 +671,54 @@ export default function Findgroup() {
     const handleCloseModal = () => {
         setModalGroupInfo(null);
     };
-    
+    // 🟢 새 핸들러: 그룹 생성 모달 열기/닫기
+    const handleOpenCreateModal = () => {
+        setIsCreateModalOpen(true);
+    };
+    const handleCloseCreateModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
+    // 🟢 새 핸들러: 그룹 생성 API 호출 및 처리 로직 (POST /api/crew)
+    const handleCreateGroupConfirm = useCallback(async (name: string, intro: string, maxMember: number) => {
+        
+        try {
+
+            // POST /api/crew 엔드포인트 호출
+            const data = await protectedFetch<CreateGroupResponse>('/api/crew', {
+                method: 'POST',
+                // API 명세에 따른 Request Body 구성
+                body: JSON.stringify({ 
+                    name: name,
+                    intro: intro,
+                    max: maxMember 
+                }), 
+            });
+            
+            // API 응답 처리
+            if (data.success) {
+                console.log(`✅ 그룹 생성 완료: ${data.message} (ID: ${data.crewId})`);
+                // 생성 성공 후 크루 목록을 새로고침
+                fetchCrewList(); 
+            } else {
+                // 이미 가입한 크루가 있는 경우 등 실패 메시지
+                console.log(`❌ 그룹 생성 실패: ${data.message}`);
+            }
+
+        } catch (error) {
+            console.error("그룹 생성 API 호출 실패:", error);
+            
+            if (error instanceof Error && error.message.includes("인증 오류")) {
+                handleAuthError();
+            } else {
+                // 서버 에러 메시지를 표시
+                console.log(`⛔ 오류 발생: ${error instanceof Error ? error.message : "그룹 생성에 실패했습니다."}`);
+            }
+            // 오류 발생 시 모달을 닫지 않고 사용자에게 오류 내용을 보여주는 것이 일반적이지만, 
+            // 현재 CreateGroupModal 로직에 따라 모달을 닫는 처리는 CreateGroupModal 내부에서 수행합니다.
+            throw error; // CreateGroupModal에서 catch하도록 오류를 다시 throw
+        }
+    }, [fetchCrewList, handleAuthError]); // 의존성 추가
     // 로딩 중 표시
     if (isLoading) {
         return (
@@ -543,6 +793,17 @@ export default function Findgroup() {
                     onClose={handleCloseModal} 
                     onConfirm={handleApplyConfirm} // 🟢 [추가된 부분] API 호출 함수 연결
                 />
+            )}
+
+            {/* 🟢 플로팅 버튼 추가 */}
+            <CreateGroupFab onClick={handleOpenCreateModal} />
+
+            {/* 🟢 그룹 생성 모달 조건부 렌더링 */}
+            {isCreateModalOpen && (
+                <CreateGroupModal 
+                    onClose={handleCloseCreateModal}
+                    onCreate={handleCreateGroupConfirm} // 나중에 API 연결
+                />
             )}
         </div>
     );
