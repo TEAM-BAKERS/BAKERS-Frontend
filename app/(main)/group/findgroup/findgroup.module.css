@@ -1,0 +1,429 @@
+/* 전체 화면 중앙 정렬 */
+.outerContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  display: flex;
+  justify-content: center;
+}
+
+/* 모바일 뷰 제한 컨테이너 (최대 430px) */
+.container {
+  width: 100%;
+  max-width: 430px; 
+  background-color: #F7F7F8;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 96px; 
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1); 
+  overflow: hidden; 
+  font-family: "Pretendard";
+}
+
+.upperContainer {
+    width: 100%;
+    height: 124px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.searchInput{
+  border-radius: 12px;
+  width: 334px;
+  height: 48px;
+  padding: 12px;
+  background-color: rgba(112, 115, 124, 0.08);
+  color: #111;
+}
+
+.searchInput:focus{
+  outline: none;
+}
+
+.infoContainer{
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    gap: 16px;
+}
+
+.infoDetail{
+  background-color: #FFF;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+.upInfo{
+  display: flex;
+  gap: 24px;
+}
+
+.groupImage{
+  border-radius: 12px;
+}
+.tagArea{
+  display: flex;
+  gap : 4px;
+}
+
+.tagdiv{
+  height: 24px;
+  background-color: #F4F4F5;
+  border-radius: 8px;
+  color: rgba(46, 47, 51, 0.88);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.downInfo{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.groupStatArea{
+  display: flex;
+  gap: 15px;
+}
+
+.eachStat{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.applyBtn{
+  background-color: #06f;
+  width: 93px;
+  height: 36px;
+  border-radius: 10px;
+  color: #fff;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  
+}
+
+
+/* ======================== 모달 스타일 ======================== */
+
+/* 모달 오버레이 (배경) */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* 어두운 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+/* 모달 내용 컨테이너 */
+.modalContainer {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 320px; /* 모바일 크기 기준 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    text-align: center;
+}
+
+/* 닫기 버튼 (X) */
+.modalCloseButton {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #171719;
+}
+
+/* "가입 신청" 제목 */
+.modalTitle {
+    font-size: 17px;
+    font-weight: 600;
+    color: #171719;
+    margin-bottom: 20px;
+}
+
+/* 그룹 이름 */
+.modalGroupName {
+    color: #0066FF; /* 파란색 강조 */
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+}
+
+/* 안내 문구 */
+.modalBodyText {
+    font-size: 14px;
+    color: #4a4a4a;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+/* 버튼 영역 */
+.modalButtonArea {
+    display: flex;
+    gap: 10px;
+    justify-content: stretch;
+}
+
+/* 취소 버튼 */
+.modalCancelButton {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    color: #4a4a4a;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* 신청하기 버튼 */
+.modalConfirmButton {
+    flex-grow: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0066FF; /* 메인 파란색 */
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* 검색창과 자동완성 목록을 감싸는 Wrapper */
+.searchAutocompleteWrapper {
+    width: 100%;
+    /* upperContainer가 중앙 정렬이므로, 이 wrapper는 컨테이너의 너비에 맞게 설정 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* input과 list를 중앙 정렬 */
+    position: relative; /* 자동완성 목록을 띄우기 위함 */
+}
+
+/* 검색창 div (기존 searchBox와 동일 역할) */
+.searchBox {
+    z-index: 10; /* input이 목록 위에 오도록 */
+}
+
+/* 검색 input */
+.searchInput{
+    /* ... 기존 스타일 유지 ... */
+    border-radius: 12px;
+    width: 334px;
+    height: 48px;
+    padding: 12px;
+    background-color: rgba(112, 115, 124, 0.08);
+    color: #111;
+}
+.searchInput:focus{
+    outline: 2px solid #0066FF; /* 포커스 시 강조 */
+}
+
+/* 자동완성 목록 스타일 */
+.autocompleteList {
+    position: absolute; /* 검색창 바로 아래에 띄우기 */
+    top: 100%; /* 검색창 아래에 배치 */
+    width: 334px; /* 검색창과 너비 맞추기 */
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0; /* 검색창과의 간격 */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 5; /* 목록이 다른 콘텐츠 위에 오도록 */
+    max-height: 200px;
+    overflow-y: auto;
+    left: 50%;
+    transform: translateX(-50%); /* 중앙 정렬 */
+}
+
+/* 자동완성 개별 항목 스타일 */
+.autocompleteItem {
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 400;
+    color: #171719;
+    text-align: left;
+}
+
+.autocompleteItem:last-child {
+    border-bottom: none;
+}
+
+.autocompleteItem:hover {
+    background-color: #f0f0f5; /* 마우스 오버 시 색상 변경 */
+    font-weight: 500;
+}
+
+.statIcon{
+  width: 18px;
+  height: 18px;
+}
+
+.fabButton {
+    position: fixed;
+    bottom: 80px; /* 하단 Navigation Bar가 있다면 그 위로 위치 */
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #06f; /* 예시 색상 */
+    color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+
+/* findgroup.module.css 에 추가할 내용 */
+
+/* 2. 그룹 생성 모달 컨테이너 (GroupCreateModal) */
+.modalOverlay {
+    /* 기존 ApplyModal과 동일한 오버레이 재사용 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.createGroupModalContainer {
+    /* 첨부 이미지에 따라 높이가 높은 모달로 설정 */
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90%; /* 화면 너비에 맞춤 */
+    max-width: 450px;
+    padding: 30px 24px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 닫기 버튼은 기존 modalCloseButton 사용 */
+/* modalTitle, modalButtonArea 등 기존 스타일도 재사용 가능 */
+
+
+/* 입력 필드 제목 스타일 */
+.inputLabel {
+    font-size: 13px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+/* 일반적인 입력 스타일 (그룹 이름, 텍스트 영역) */
+.groupNameInput,
+.groupIntroTextarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    background-color: rgba(112, 115, 124, 0.08);
+    resize: none; /* textarea 크기 조절 방지 */
+}
+
+.groupNameInput:focus,
+.groupIntroTextarea:focus {
+    outline: none;
+    
+}
+
+/* findgroup.module.css 에 추가할 내용 */
+
+/* 3. 정원 입력 필드 및 버튼 스타일 */
+
+/* 정원 수치 조절 영역 전체 (레이아웃 조정) */
+.memberControl {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 입력창과 버튼 그룹 사이 간격 */
+}
+
+/* + / - 버튼을 감싸는 div (버튼 묶음) */
+.memberButtons {
+    display: flex;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 정원 표시 입력 필드 */
+.memberCountInput {
+    width: 80%; /* 너비 고정 */
+    height: 44px;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    box-sizing: border-box;
+    background-color: rgba(112, 115, 124, 0.08);
+    -moz-appearance: textfield; /* Firefox에서 숫자 입력 화살표 숨김 */
+}
+
+.memberCountInput::-webkit-outer-spin-button,
+.memberCountInput::-webkit-inner-spin-button {
+    /* Chrome, Safari에서 숫자 입력 화살표 숨김 */
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+/* + / - 개별 버튼 */
+.memberMinus,
+.memberPlus {
+    width: 44px;
+    height: 44px;
+    background-color: rgba(112, 115, 124, 0.08);
+    color: #171719;
+    font-size: 20px;
+    font-weight: 400;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.memberMinus {
+    border-right: 1px solid #e5e7eb;
+}
+
+.memberPlus:hover,
+.memberMinus:hover:not(:disabled) {
+    background-color: #e5e7eb;
+}
+
+.memberMinus:disabled {
+    color: #b0b0b0;
+    cursor: not-allowed;
+}
