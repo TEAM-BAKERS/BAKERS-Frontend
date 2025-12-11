@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export default function NavBar() {
   const pathname = usePathname();
 
-  if (pathname === "/home/upload") {
+  if (pathname === "/home/upload" || pathname === "/home/battle-league") {
     return null;
   }
 
