@@ -85,8 +85,6 @@ export default function BattleLeaguePage() {
   const [myNickname, setMyNickname] = useState<string | null>(null);
 
   useEffect(() => {
-    // 로컬 스토리지에서 내 닉네임 가져오기 (로그인 시 저장했다고 가정)
-    // 만약 userId를 저장했다면 userId로 비교하는 것이 더 정확합니다.
     const storedNickname = localStorage.getItem("nickname"); // 혹은 userId
     setMyNickname(storedNickname);
 
@@ -97,12 +95,16 @@ export default function BattleLeaguePage() {
           {
             headers: {
               "Content-Type": "application/json",
-              // 토큰이 필요하다면 아래 주석 해제
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
           }
         );
-
+        if (response.status === 204) {
+          console.log("진행 중인 배틀 없음 (204)");
+          setBattleData(null);
+          setLoading(false);
+          return;
+        }
         if (response.ok) {
           const data = await response.json();
           setBattleData(data);
